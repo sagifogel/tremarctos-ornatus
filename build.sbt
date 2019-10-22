@@ -54,5 +54,8 @@ scalacOptions ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "org.typelevel" %% "cats-core" % "2.0.0"
+  "org.typelevel" %% "cats-core" % "2.0.0",
+  "dev.zio" %% "zio" % "1.0.0-RC15",
+  "io.circe" %% "circe-config" % "0.7.0",
+  "io.circe" %% "circe-generic" % "0.12.3"
 )

@@ -2,14 +2,13 @@ package com.github.sagifogel.tremarctosornatus
 
 import cats.implicits._
 
-import java.awt.image.BufferedImage
 import com.github.sagifogel.tremarctosornatus.syntax.BufferedImageSyntax._
 
 final case class Kernel(length: Int, weight: Int, matrix: Array[Double])
 
 object Gaussian {
   private def createKernel(length: Int, weight: Int): Kernel = {
-    val kernel = Array.fill(length)(Array.fill[Double](length)(elem = 0))
+    val kernel = Array.fill(length)(Array.fill(length)(elem = 0d))
     val lines = (length - 1) / 2
     val constant = 1d / (2 * Math.PI * weight * weight)
 

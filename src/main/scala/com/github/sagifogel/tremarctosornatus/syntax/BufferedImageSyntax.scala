@@ -1,18 +1,24 @@
 package com.github.sagifogel.tremarctosornatus.syntax
 
-import cats.implicits._
 import cats.syntax.eq._
+import cats.instances.int._
 
 import java.awt.image.BufferedImage
 
 object BufferedImageSyntax {
-
   implicit class BufferedImageOps(val bufferedImage: BufferedImage) extends AnyVal {
-    def fromArray[T](data: Array[T]): BufferedImage = {
+    def fromArray(rgbArray: Array[Int], x: Int, y: Int, width: Int, height: Int): BufferedImage = {
       val colorModel = bufferedImage.getColorModel
       val raster = colorModel.createCompatibleWritableRaster(bufferedImage.getWidth, bufferedImage.getHeight)
+      val newBufferedImage = new BufferedImage(colorModel, raster, colorModel.isAlphaPremultiplied, null)
+      val imageType = bufferedImage.getType
 
-      new BufferedImage(colorModel, raster, colorModel.isAlphaPremultiplied, null)
+      if (imageType === BufferedImage.TYPE_INT_ARGB || imageType === BufferedImage.TYPE_INT_RGB)
+        newBufferedImage.getRaster.setDataElements(x, y, width, height, rgbArray)
+      else
+        newBufferedImage.setRGB(x, y, width, height, rgbArray, 0, width)
+
+      newBufferedImage
     }
 
     def getARGB(x: Int, y: Int, height: Int, width: Int): Array[Int] = {
