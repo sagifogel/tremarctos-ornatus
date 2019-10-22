@@ -3,6 +3,7 @@ package com.github.sagifogel.tremarctosornatus
 import cats.implicits._
 
 import java.awt.image.BufferedImage
+import com.github.sagifogel.tremarctosornatus.syntax.BufferedImageSyntax._
 
 final case class Kernel(length: Int, weight: Int, matrix: Array[Double])
 
@@ -36,15 +37,6 @@ object Gaussian {
     process(image, createKernel(19, 9))
   }
 
-  def getARGB(bufferedImage: BufferedImage, x: Int, y: Int, height: Int, width: Int): Array[Int] = {
-    val imageType = bufferedImage.getType
-    val pixels = Array.range(0, width * height)
-
-    if (imageType === BufferedImage.TYPE_INT_ARGB || imageType === BufferedImage.TYPE_INT_RGB) {
-      bufferedImage.getRaster.getDataElements(x, y, width, height, pixels).asInstanceOf[Array[Int]]
-    } else bufferedImage.getRGB(x, y, width, height, pixels, 0, width)
-  }
-
   private def clamp(color: Double): Int = {
     val value = color.toInt
     if (value < 0) 0
@@ -60,7 +52,7 @@ object Gaussian {
     val height = cell.buffer.getHeight
     val width = cell.buffer.getWidth
     val matrix = kernel.matrix
-    val imagePixels = getARGB(cell.buffer, 0, 0, height, width)
+    val imagePixels = cell.buffer.getARGB(0, 0, height, width)
     val argbValues = for {
       row <- -rows2 to rows2
       col <- -cols2 to cols2

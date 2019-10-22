@@ -9,23 +9,22 @@ import scala.math.Integral.Implicits._
 object ComonadInstances {
   val focusedImageFunctorInstance: Functor[FocusedImage] = new Functor[FocusedImage] {
     override def map[A, B](fa: FocusedImage[A])(f: A => B): FocusedImage[B] =
-      fa.copy(vector = fa.vector.map(f))
+      fa.copy(pixels = fa.pixels.map(f))
   }
 
-  val focusedImageCoflaMapInstance: Comonad[FocusedImage] = new Comonad[FocusedImage] {
+  implicit val focusedImageCoflaMapInstance: Comonad[FocusedImage] = new Comonad[FocusedImage] {
     override def extract[A](focusedImage: FocusedImage[A]): A =
-      focusedImage.vector(focusedImage.index)
+      focusedImage.pixels(focusedImage.index)
 
     override def coflatMap[A, B](fa: FocusedImage[A])(f: FocusedImage[A] => B): FocusedImage[B] = {
       val width = fa.buffer.getWidth
 
-      FocusedImage[B](Vector.tabulate[B](fa.vector.length)(i => {
+      FocusedImage[B](Array.tabulate[B](fa.pixels.length)(i => {
         val (y, x) = i /% width
 
-        f(FocusedImage(fa.vector, x, y, fa.buffer))
+        f(FocusedImage(fa.pixels, x, y, fa.buffer))
       }), fa.x, fa.y, fa.buffer)
     }
-
 
     override def map[A, B](fa: FocusedImage[A])(f: A => B): FocusedImage[B] =
       focusedImageFunctorInstance.map(fa)(f)
