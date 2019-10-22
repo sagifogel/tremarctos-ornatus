@@ -1,13 +1,49 @@
 package com.github.sagifogel.tremarctosornatus
 
-import cats.implicits._
+import java.awt.image.BufferedImage
+import java.io.IOException
+import java.nio.file.Paths
 
+import cats.Comonad
+import cats.implicits._
+import com.github.sagifogel.tremarctosornatus.Gaussian.Live
+import com.github.sagifogel.tremarctosornatus.Main.AppEnvironment
+import com.github.sagifogel.tremarctosornatus.config.AppSettings
 import com.github.sagifogel.tremarctosornatus.syntax.BufferedImageSyntax._
+import javax.imageio.ImageIO
+import zio.blocking._
+import zio.{IO, RIO, UIO, ZIO}
 
 final case class Kernel(length: Int, weight: Int, matrix: Array[Double])
 
+trait Gaussian {
+  val gaussian: Gaussian.Service
+}
+
 object Gaussian {
-  private def createKernel(length: Int, weight: Int): Kernel = {
+  trait Service {
+    def convolve(config: AppSettings)(implicit WA: Comonad[FocusedImage]): RIO[AppEnvironment, BufferedImage]
+  }
+
+  trait Live extends Gaussian {
+    override val gaussian: Service = new Service {
+      override def convolve(config: AppSettings)
+                           (implicit WA: Comonad[FocusedImage]): RIO[AppEnvironment, BufferedImage] =
+        for {
+          focusedImage <- blocking(resolveBufferedImage(config.imagePath).map(_.toFocusedImage))
+          convolution = config.convolution
+          kernel <- createKernel(convolution.size, convolution.weight)
+          convolutedImage <- ZIO.effect(focusedImage.coflatMap(process(_, kernel)))
+          pixels = convolutedImage.pixels.toArray
+        } yield convolutedImage.buffer.fromArray(pixels, 0, 0)
+    }
+  }
+
+  private def resolveBufferedImage(imagePath: String): IO[IOException, BufferedImage] = UIO {
+    ImageIO.read(Paths.get(imagePath).toFile)
+  }
+
+  private def createKernel(length: Int, weight: Int): UIO[Kernel] = UIO {
     val kernel = Array.fill(length)(Array.fill(length)(elem = 0d))
     val lines = (length - 1) / 2
     val constant = 1d / (2 * Math.PI * weight * weight)
@@ -32,10 +68,6 @@ object Gaussian {
     Kernel(length, weight, kernel.flatten)
   }
 
-  def convolve(image: FocusedImage[Byte]): Int = {
-    process(image, createKernel(19, 9))
-  }
-
   private def clamp(color: Double): Int = {
     val value = color.toInt
     if (value < 0) 0
@@ -43,7 +75,7 @@ object Gaussian {
     else value
   }
 
-  def process(cell: FocusedImage[Byte], kernel: Kernel): Int = {
+  def process(cell: FocusedImage[Int], kernel: Kernel): Int = {
     val rows = kernel.length
     val cols = kernel.length
     val rows2 = rows / 2
@@ -51,7 +83,7 @@ object Gaussian {
     val height = cell.buffer.getHeight
     val width = cell.buffer.getWidth
     val matrix = kernel.matrix
-    val imagePixels = cell.buffer.getARGB(0, 0, height, width)
+    val imagePixels = cell.pixels
     val argbValues = for {
       row <- -rows2 to rows2
       col <- -cols2 to cols2
@@ -74,3 +106,5 @@ object Gaussian {
     (0xff << 24) | (clamp(red) << 16) | (clamp(green) << 8) | clamp(blue)
   }
 }
+
+object Live extends Live

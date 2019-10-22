@@ -4,10 +4,9 @@ import io.circe
 import io.circe.config.parser
 import io.circe.generic.auto._
 
-final case class AppSettings(maxParallelism: Int,
-                             repeatPeriodSec: Long,
-                             maxRecordsToFetch: Int,
-                             actionExpirationTimeSec: Int)
+final case class Convolution(size: Int, weight: Int)
+final case class AppSettings(imagePath: String,
+                             convolution: Convolution)
 
 trait Config {
   val config: Either[circe.Error, AppSettings]

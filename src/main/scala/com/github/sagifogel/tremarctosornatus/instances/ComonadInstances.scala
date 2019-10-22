@@ -8,9 +8,8 @@ import scala.math.Integral.Implicits._
 
 object ComonadInstances {
   val focusedImageFunctorInstance: Functor[FocusedImage] = new Functor[FocusedImage] {
-    override def map[A, B](fa: FocusedImage[A])(f: A => B): FocusedImage[B] = {
+    override def map[A, B](fa: FocusedImage[A])(f: A => B): FocusedImage[B] =
       fa.copy(pixels = fa.pixels.map(f))
-    }
   }
 
   implicit val focusedImageCoflaMapInstance: Comonad[FocusedImage] = new Comonad[FocusedImage] {
