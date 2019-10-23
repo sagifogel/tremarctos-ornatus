@@ -4,12 +4,13 @@ import cats.syntax.eq._
 import cats.instances.int._
 import java.awt.image.BufferedImage
 
-import com.github.sagifogel.tremarctosornatus.FocusedImage
+import com.github.sagifogel.tremarctosornatus.data
+import com.github.sagifogel.tremarctosornatus.data.FocusedImage
 
 object BufferedImageSyntax {
   implicit class BufferedImageOps(val bufferedImage: BufferedImage) extends AnyVal {
     def toFocusedImage: FocusedImage[Int] = {
-      FocusedImage[Int](bufferedImage.getARGB(0, 0).toVector, 0, 0, bufferedImage)
+      data.FocusedImage[Int](bufferedImage.getARGB(0, 0).toVector, 0, 0, bufferedImage)
     }
     def fromArray(rgbArray: Array[Int], x: Int, y: Int): BufferedImage = {
       val width = bufferedImage.getWidth

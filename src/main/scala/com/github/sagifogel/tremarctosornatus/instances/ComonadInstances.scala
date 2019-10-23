@@ -1,7 +1,7 @@
 package com.github.sagifogel.tremarctosornatus.instances
 
 import cats.{Comonad, Functor}
-import com.github.sagifogel.tremarctosornatus.FocusedImage
+import com.github.sagifogel.tremarctosornatus.data.FocusedImage
 import com.github.sagifogel.tremarctosornatus.syntax.FocusedImageSyntax._
 
 import scala.math.Integral.Implicits._

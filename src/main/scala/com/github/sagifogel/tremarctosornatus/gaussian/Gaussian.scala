@@ -1,18 +1,16 @@
-package com.github.sagifogel.tremarctosornatus
+package com.github.sagifogel.tremarctosornatus.gaussian
 
 import java.awt.image.BufferedImage
-import java.io.IOException
-import java.nio.file.Paths
 
 import cats.Comonad
 import cats.implicits._
-import com.github.sagifogel.tremarctosornatus.Gaussian.Live
 import com.github.sagifogel.tremarctosornatus.Main.AppEnvironment
 import com.github.sagifogel.tremarctosornatus.config.AppSettings
+import com.github.sagifogel.tremarctosornatus.data.FocusedImage
+import com.github.sagifogel.tremarctosornatus.gaussian.Gaussian.Live
+import com.github.sagifogel.tremarctosornatus.image.ImageService
 import com.github.sagifogel.tremarctosornatus.syntax.BufferedImageSyntax._
-import javax.imageio.ImageIO
-import zio.blocking._
-import zio.{IO, RIO, UIO, ZIO}
+import zio.{RIO, UIO, ZIO}
 
 final case class Kernel(length: Int, weight: Int, matrix: Array[Double])
 
@@ -30,17 +28,14 @@ object Gaussian {
       override def convolve(config: AppSettings)
                            (implicit WA: Comonad[FocusedImage]): RIO[AppEnvironment, BufferedImage] =
         for {
-          focusedImage <- blocking(resolveBufferedImage(config.imagePath).map(_.toFocusedImage))
+          imageService <- ZIO.access[ImageService](_.image)
+          focusedImage <- imageService.readImage(config).map(_.toFocusedImage)
           convolution = config.convolution
           kernel <- createKernel(convolution.size, convolution.weight)
           convolutedImage <- ZIO.effect(focusedImage.coflatMap(process(_, kernel)))
           pixels = convolutedImage.pixels.toArray
         } yield convolutedImage.buffer.fromArray(pixels, 0, 0)
     }
-  }
-
-  private def resolveBufferedImage(imagePath: String): IO[IOException, BufferedImage] = UIO {
-    ImageIO.read(Paths.get(imagePath).toFile)
   }
 
   private def createKernel(length: Int, weight: Int): UIO[Kernel] = UIO {

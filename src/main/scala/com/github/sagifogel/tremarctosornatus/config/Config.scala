@@ -1,5 +1,6 @@
 package com.github.sagifogel.tremarctosornatus.config
 
+import com.github.sagifogel.tremarctosornatus.config.Config.Live
 import io.circe
 import io.circe.config.parser
 import io.circe.generic.auto._
@@ -16,6 +17,6 @@ object Config {
   trait Live extends Config {
     val config: Either[circe.Error, AppSettings] = parser.decode[AppSettings]
   }
-
-  object Live extends Live
 }
+
+object Live extends Live

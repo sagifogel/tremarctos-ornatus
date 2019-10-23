@@ -1,7 +1,8 @@
 package com.github.sagifogel.tremarctosornatus
 
 import com.github.sagifogel.tremarctosornatus.config.Config
-
+import com.github.sagifogel.tremarctosornatus.gaussian.Gaussian
+import com.github.sagifogel.tremarctosornatus.image.ImageService
 import zio._
 import zio.blocking.Blocking
 import zio.clock.Clock
@@ -14,21 +15,23 @@ import scala.{Function => F}
 object Main extends App {
   import com.github.sagifogel.tremarctosornatus.instances.ComonadInstances._
 
-  type AppEnvironment = ZEnv with Config with Gaussian
+  type AppEnvironment = ZEnv with Config with Gaussian with ImageService
 
   override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, Int] = {
     val environment: AppEnvironment = new Config.Live
       with Gaussian.Live with Clock.Live with Console.Live
-      with System.Live with Random.Live with Blocking.Live
+      with System.Live with Random.Live with Blocking.Live with ImageService.Live
 
     program.provideSome(F.const(environment))
-      .foldM(ex => putStrLn(s"Execution failed with: $ex") *> ZIO.succeed(1), F.const(ZIO.succeed(1)))
+      .foldM(ex => putStrLn(s"Execution failed with: $ex") *> ZIO.succeed(1), F.const(ZIO.succeed(0)))
   }
 
   private val program: ZIO[AppEnvironment, Throwable, Unit] =
     for {
       config <- ZIO.access[Config](_.config).flatMap(ZIO.fromEither(_))
       gaussian <- ZIO.access[Gaussian](_.gaussian)
-      _ <- gaussian.convolve(config)
+      imageService <- ZIO.access[ImageService](_.image)
+      buffer <- gaussian.convolve(config)
+      _ <- imageService.writeImage(config, buffer)
     } yield ()
 }
