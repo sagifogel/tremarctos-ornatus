@@ -48,7 +48,7 @@ object Gaussian {
       y <- -lines until lines
       distance = ((y * y) + (x * x)) / (2 * weight * weight)
       storedValue = constant * Math.exp(-distance.toDouble)
-      _ = kernel(x)(y) = storedValue
+      _ = kernel(x + lines)(y + lines) = storedValue
     } yield ()
 
     val kernelSum = kernel.foldLeft(0d)((accum, arr) => arr.sum + accum)

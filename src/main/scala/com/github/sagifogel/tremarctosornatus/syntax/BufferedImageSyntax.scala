@@ -10,8 +10,9 @@ import com.github.sagifogel.tremarctosornatus.data.FocusedImage
 object BufferedImageSyntax {
   implicit class BufferedImageOps(val bufferedImage: BufferedImage) extends AnyVal {
     def toFocusedImage: FocusedImage[Int] = {
-      data.FocusedImage[Int](bufferedImage.getARGB(0, 0).toVector, 0, 0, bufferedImage)
+      FocusedImage[Int](bufferedImage.getARGB(0, 0).toVector, 0, 0, bufferedImage)
     }
+
     def fromArray(rgbArray: Array[Int], x: Int, y: Int): BufferedImage = {
       val width = bufferedImage.getWidth
       val height = bufferedImage.getHeight

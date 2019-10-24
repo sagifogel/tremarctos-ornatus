@@ -3,6 +3,7 @@ package com.github.sagifogel.tremarctosornatus
 import com.github.sagifogel.tremarctosornatus.config.Config
 import com.github.sagifogel.tremarctosornatus.gaussian.Gaussian
 import com.github.sagifogel.tremarctosornatus.image.ImageService
+import com.github.sagifogel.tremarctosornatus.instances.ComonadInstances._
 import zio._
 import zio.blocking.Blocking
 import zio.clock.Clock
@@ -13,8 +14,6 @@ import zio.system.System
 import scala.{Function => F}
 
 object Main extends App {
-  import com.github.sagifogel.tremarctosornatus.instances.ComonadInstances._
-
   type AppEnvironment = ZEnv with Config with Gaussian with ImageService
 
   override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, Int] = {

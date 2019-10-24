@@ -1,5 +1,5 @@
 package com.github.sagifogel.tremarctosornatus.data
 
-class FocusedImage {
+import java.awt.image.BufferedImage
 
-}
+final case class FocusedImage[A](pixels: Vector[A], x: Int, y: Int, buffer: BufferedImage)
