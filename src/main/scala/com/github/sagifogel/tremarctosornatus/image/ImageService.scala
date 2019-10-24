@@ -21,18 +21,17 @@ trait ImageService {
 final case class SavedFile(filePath: String, extension: String)
 
 object ImageService {
-
   trait Service {
     def readImage(config: AppSettings): ZIO[AppEnvironment, IOException, BufferedImage]
 
     def writeImage(config: AppSettings, buffer: BufferedImage):
-      ZIO[AppEnvironment, IOException, Unit]
+    ZIO[AppEnvironment, IOException, Unit]
   }
 
   trait Live extends ImageService {
     val image: Service = new Service {
       override def readImage(config: AppSettings): ZIO[AppEnvironment, IOException, BufferedImage] = {
-        val file = Paths.get(config.imagePath).toFile
+        val file = Paths.get(config.convolution.imagePath).toFile
 
         effectBlocking(ImageIO.read(file)).refineToOrDie[IOException]
       }
@@ -41,7 +40,7 @@ object ImageService {
         for {
           console <- ZIO.access[Console](_.console)
           _ <- effectBlocking {
-            val savedFile = resolveNewFileName(config.imagePath)
+            val savedFile = resolveNewFileName(config.convolution.imagePath)
             val file = Paths.get(savedFile.filePath).toFile
 
             ImageIO.write(buffer, savedFile.extension, file)

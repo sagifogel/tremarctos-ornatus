@@ -5,9 +5,8 @@ import io.circe
 import io.circe.config.parser
 import io.circe.generic.auto._
 
-final case class Convolution(size: Int, weight: Int)
-final case class AppSettings(imagePath: String,
-                             convolution: Convolution)
+final case class Convolution(radius: Float, imagePath: String)
+final case class AppSettings(convolution: Convolution)
 
 trait Config {
   val config: Either[circe.Error, AppSettings]

@@ -1,10 +1,9 @@
 package com.github.sagifogel.tremarctosornatus.syntax
 
-import cats.syntax.eq._
-import cats.instances.int._
 import java.awt.image.BufferedImage
 
-import com.github.sagifogel.tremarctosornatus.data
+import cats.instances.int._
+import cats.syntax.eq._
 import com.github.sagifogel.tremarctosornatus.data.FocusedImage
 
 object BufferedImageSyntax {

@@ -30,7 +30,8 @@ object Main extends App {
       config <- ZIO.access[Config](_.config).flatMap(ZIO.fromEither(_))
       gaussian <- ZIO.access[Gaussian](_.gaussian)
       imageService <- ZIO.access[ImageService](_.image)
-      buffer <- gaussian.convolve(config)
-      _ <- imageService.writeImage(config, buffer)
+      buffer <- imageService.readImage(config)
+      output <- gaussian.convolve(config, buffer)
+      _ <- imageService.writeImage(config, output)
     } yield ()
 }
