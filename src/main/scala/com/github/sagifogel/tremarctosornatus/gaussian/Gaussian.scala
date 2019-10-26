@@ -59,7 +59,7 @@ object Gaussian {
       row <- -roundRadius to roundRadius
       distance = (row * row).toFloat
       value = if (distance > radius2) 0f
-      else Math.exp(-distance / sigma22).toFloat / sqrtSigmaPi2
+              else Math.exp(-distance / sigma22).toFloat / sqrtSigmaPi2
     } yield value.toFloat
 
     val total = kernelValues.sum
@@ -85,7 +85,7 @@ object Gaussian {
         for {
           col <- -cols2 until cols2
           f = kernel(moffset + col)
-          if f != 0
+          if f =!= 0
           xcol = focus.x + col
           ix = if (xcol < 0) 0
           else if (xcol >= width) width - 1
