@@ -16,13 +16,6 @@ trait Gaussian {
 }
 
 object Gaussian {
-  private[Gaussian] object ARGB {
-    val red: Int = 0
-    val green: Int = 1
-    val blue: Int = 2
-    val alpha: Int = 255
-  }
-
   trait Service {
     def convolve(config: AppSettings, buffer: BufferedImage)
                 (implicit WA: CoflatMap[FocusedImage]): Task[BufferedImage]
