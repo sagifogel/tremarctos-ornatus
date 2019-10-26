@@ -18,8 +18,8 @@ object Main extends App {
 
   override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, Int] = {
     val environment: AppEnvironment = new Config.Live
-      with Gaussian.Live with Clock.Live with Console.Live
-      with System.Live with Random.Live with Blocking.Live with ImageService.Live
+      with Gaussian.Live with ImageService.Live with Clock.Live
+      with Console.Live with System.Live with Random.Live with Blocking.Live
 
     program.provideSome(F.const(environment))
       .foldM(ex => putStrLn(s"Execution failed with: $ex") *> ZIO.succeed(1), F.const(ZIO.succeed(0)))
