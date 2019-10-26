@@ -12,7 +12,7 @@ object ComonadInstances {
       fa.copy(pixels = fa.pixels.map(f))
   }
 
-  implicit val focusedImageCoflaMapInstance: Comonad[FocusedImage] = new Comonad[FocusedImage] {
+  implicit val focusedImageComonadInstance: Comonad[FocusedImage] = new Comonad[FocusedImage] {
     override def extract[A](fa: FocusedImage[A]): A =
       fa.pixels(fa.index)
 
