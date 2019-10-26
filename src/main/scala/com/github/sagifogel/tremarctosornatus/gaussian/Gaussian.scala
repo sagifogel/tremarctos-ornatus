@@ -40,10 +40,9 @@ object Gaussian {
         val height = focusedImage.height
         val process = filter(_, kernel, radius)
         val transposed = (focus: FocusedImage[Int]) => process(focus.copy(height = width, width = height))
-        val composedFilter = process =>= transposed
 
         for {
-          convolutedImage <- ZIO.effect(focusedImage.coflatMap(composedFilter))
+          convolutedImage <- ZIO.effect(focusedImage.coflatMap(process =>= transposed))
         } yield convolutedImage.buffer.fromVector(convolutedImage.pixels, 0, 0)
       }
     }
