@@ -11,6 +11,8 @@ import com.github.sagifogel.tremarctosornatus.gaussian.Gaussian.Live
 import com.github.sagifogel.tremarctosornatus.syntax.BufferedImageSyntax._
 import zio.{Task, ZIO}
 
+final case class Kernel(width: Int, height: Int, data: Vector[Float])
+
 trait Gaussian {
   val gaussian: Gaussian.Service
 }
@@ -41,8 +43,9 @@ object Gaussian {
     }
   }
 
-  private def createKernel(radius: Float): Vector[Float] = {
+  private def createKernel(radius: Float): Kernel = {
     val roundRadius = radius.ceil.toInt
+    val rows = roundRadius * 2 + 1
     val sigma = radius / 3
     val sigma22 = 2 * sigma * sigma
     val sigmaPi2 = 2f * Math.PI.toFloat * sigma
@@ -56,8 +59,9 @@ object Gaussian {
     } yield value.toFloat
 
     val total = kernelValues.sum
+    val data = kernelValues.foldLeft(Vector.empty[Float])(_ :+ _ / total)
 
-    kernelValues.foldLeft(Vector.empty[Float])(_ :+ _ / total)
+    Kernel(rows, 1, data)
   }
 
   private def clamp(color: Float): Int = {
@@ -67,17 +71,18 @@ object Gaussian {
     else value
   }
 
-  private def filter(focus: FocusedImage[Int], kernel: Vector[Float], radius: Float): Int = {
+  private def filter(focus: FocusedImage[Int], kernel: Kernel, radius: Float): Int = {
     if (radius === 0) 0
     else {
+      val matrix = kernel.data
       val width = focus.width
-      val cols2 = width / 2
+      val cols2 = kernel.width / 2
       val ioffset = focus.y * width
       val moffset = cols2
       val rgbs =
         for {
           col <- -cols2 until cols2
-          f = kernel(moffset + col)
+          f = matrix(moffset + col)
           if f =!= 0
           xcol = focus.x + col
           ix = if (xcol < 0) 0

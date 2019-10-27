@@ -37,7 +37,7 @@ object BufferedImageSyntax {
       val width = bufferedImage.getWidth
       val height = bufferedImage.getHeight
       val imageType = bufferedImage.getType
-      val pixels = Array.range(0, width * height)
+      val pixels = Array.fill(width * height)(0)
 
       if (imageType === BufferedImage.TYPE_INT_ARGB || imageType === BufferedImage.TYPE_INT_RGB)
         bufferedImage.getRaster.getDataElements(x, y, width, height, pixels).asInstanceOf[Array[Int]]
