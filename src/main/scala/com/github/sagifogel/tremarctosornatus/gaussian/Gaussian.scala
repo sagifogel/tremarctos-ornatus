@@ -6,7 +6,6 @@ import cats.CoflatMap
 import cats.implicits._
 import com.github.sagifogel.tremarctosornatus.config.AppSettings
 import com.github.sagifogel.tremarctosornatus.data.FocusedImage
-import com.github.sagifogel.tremarctosornatus.syntax.CoflatMapSyntax._
 import com.github.sagifogel.tremarctosornatus.gaussian.Gaussian.Live
 import com.github.sagifogel.tremarctosornatus.syntax.BufferedImageSyntax._
 import zio.{Task, ZIO}
@@ -34,11 +33,12 @@ object Gaussian {
         val width = focusedImage.width
         val height = focusedImage.height
         val process = filter(_, kernel, radius)
-        val transposed = (focus: FocusedImage[Int]) => process(focus.copy(height = width, width = height))
 
         for {
-          convolutedImage <- ZIO.effect(focusedImage.coflatMap(process =>= transposed))
-        } yield convolutedImage.buffer.fromVector(convolutedImage.pixels, 0, 0)
+          convolutedImage <- ZIO.effect(focusedImage.coflatMap(process))
+          transposedImage = convolutedImage.copy(height = width, width = height)
+          gaussianImage <- ZIO.effect(transposedImage.coflatMap(process))
+        } yield gaussianImage.buffer.fromVector(convolutedImage.pixels, 0, 0)
       }
     }
   }
