@@ -55,7 +55,7 @@ object Gaussian {
       row <- -roundRadius to roundRadius
       distance = (row * row).toFloat
       value = if (distance > radius2) 0f
-              else Math.exp(-distance / sigma22).toFloat / sqrtSigmaPi2
+      else Math.exp(-distance / sigma22).toFloat / sqrtSigmaPi2
     } yield value.toFloat
 
     val total = kernelValues.sum
@@ -99,7 +99,7 @@ object Gaussian {
           b = f * pb
         } yield (a, r, g, b)
 
-      val (a, r, b, g) = rgbs.foldLeft((0.5f, 0.5f, 0.5f, 0.5f))(_ |+| _)
+      val (a, r, g, b) = rgbs.foldLeft((0.5f, 0.5f, 0.5f, 0.5f))(_ |+| _)
       val ia = clamp(a)
       val ir = clamp(r)
       val ig = clamp(g)

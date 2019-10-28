@@ -17,11 +17,16 @@ object ComonadInstances {
       fa.pixels(fa.index)
 
     override def coflatMap[A, B](fa: FocusedImage[A])(f: FocusedImage[A] => B): FocusedImage[B] = {
-      FocusedImage(Vector.tabulate(fa.pixels.length)(i => {
+      val height = fa.height
+      val indexedValues = Vector.range(0, fa.pixels.length).map(i => {
         val (y, x) = i /% fa.buffer.getWidth
+        val index = if (y == 0) x * height else y * height + x
+        val value = f(FocusedImage(fa.pixels, x, y, fa.width, fa.height, fa.buffer))
+        (index, value)
+      })
+      val pixels = indexedValues.sortBy(_._1).map(_._2)
 
-        f(FocusedImage(fa.pixels, x, y, fa.width, fa.height, fa.buffer))
-      }), fa.x, fa.y, fa.width, fa.height, fa.buffer)
+      FocusedImage(pixels, fa.x, fa.y, fa.width, fa.height, fa.buffer)
     }
 
     override def map[A, B](fa: FocusedImage[A])(f: A => B): FocusedImage[B] =
