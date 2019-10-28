@@ -20,12 +20,11 @@ object ComonadInstances {
       val height = fa.height
       val indexedValues = Vector.range(0, fa.pixels.length).map(i => {
         val (y, x) = i /% fa.buffer.getWidth
-        val index = if (y == 0) x * height else y * height + x
+        val index = x * height + y
         val value = f(FocusedImage(fa.pixels, x, y, fa.width, fa.height, fa.buffer))
         (index, value)
       })
       val pixels = indexedValues.sortBy(_._1).map(_._2)
-
       FocusedImage(pixels, fa.x, fa.y, fa.width, fa.height, fa.buffer)
     }
 
