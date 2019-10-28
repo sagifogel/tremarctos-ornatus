@@ -37,6 +37,8 @@ object Gaussian {
         for {
           convolutedImage <- ZIO.effect(focusedImage.coflatMap(process))
           transposedImage = convolutedImage.copy(height = width, width = height)
+          str = transposedImage.pixels.take(100).mkString(",")
+          _ = println(str)
           gaussianImage <- ZIO.effect(transposedImage.coflatMap(process))
         } yield gaussianImage.buffer.fromVector(convolutedImage.pixels, 0, 0)
       }
@@ -81,7 +83,7 @@ object Gaussian {
       val moffset = cols2
       val rgbs =
         for {
-          col <- -cols2 until cols2
+          col <- -cols2 to cols2
           f = matrix(moffset + col)
           if f =!= 0
           xcol = focus.x + col
