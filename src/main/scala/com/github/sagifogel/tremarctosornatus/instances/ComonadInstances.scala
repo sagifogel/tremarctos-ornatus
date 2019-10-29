@@ -22,15 +22,18 @@ object ComonadInstances {
       val indexedValues = Vector.range(0, fa.pixels.length).map(i => {
         val (y, x) = i /% width
         val index = x * height + y
-        val value = f(FocusedImage(fa.pixels, x, y, fa.width, fa.height, fa.buffer))
+        val value = f(FocusedImage(fa.pixels, x, y, width, height, fa.buffer))
+
         (index, value)
       })
+
       val pixels = indexedValues.sortBy(_._1).map(_._2)
 
-      FocusedImage(pixels, fa.x, fa.y, fa.width, fa.height, fa.buffer)
+      FocusedImage(pixels, fa.x, fa.y, width, height, fa.buffer)
     }
 
     override def map[A, B](fa: FocusedImage[A])(f: A => B): FocusedImage[B] =
       focusedImageFunctorInstance.map(fa)(f)
   }
 }
+
