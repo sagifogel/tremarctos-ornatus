@@ -37,10 +37,8 @@ object Gaussian {
         for {
           convolutedImage <- ZIO.effect(focusedImage.coflatMap(process))
           transposedImage = convolutedImage.copy(height = width, width = height)
-          str = transposedImage.pixels.take(100).mkString(",")
-          _ = println(str)
           gaussianImage <- ZIO.effect(transposedImage.coflatMap(process))
-        } yield gaussianImage.buffer.fromVector(convolutedImage.pixels, 0, 0)
+        } yield gaussianImage.buffer.fromVector(gaussianImage.pixels, 0, 0)
       }
     }
   }
