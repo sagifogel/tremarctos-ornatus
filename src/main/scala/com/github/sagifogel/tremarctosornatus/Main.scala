@@ -21,7 +21,7 @@ object Main extends App {
       with Gaussian.Live with ImageService.Live with Clock.Live
       with Console.Live with System.Live with Random.Live with Blocking.Live
 
-    program.provideSome(F.const(environment))
+    program.provide(environment)
       .foldM(ex => putStrLn(s"Execution failed with: $ex") *> ZIO.succeed(1), F.const(ZIO.succeed(0)))
   }
 
